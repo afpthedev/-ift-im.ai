@@ -1,0 +1,120 @@
+services:
+  # Hadoop NameNode Servisi
+  namenode:
+    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+    container_name: namenode
+    restart: always
+    ports:
+      - "9870:9870"
+      - "9000:9000"
+    volumes:
+      - ./hadoop/data/namenode:/hadoop/dfs/name
+      - ./hadoop/config:/hadoop/config
+      - ./hadoop/scripts:/hadoop/scripts
+      - ./data/raw:/opt/bitnami/spark/data/raw
+    environment:
+      - CLUSTER_NAME=agri-predict-hadoop
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:9000
+      - CORE_CONF_hadoop_http_staticuser_user=root
+      - HDFS_CONF_dfs_replication=1
+      - HDFS_CONF_dfs_permissions=false
+    env_file:
+      - ./hadoop/hadoop.env
+    networks:
+      - agri-network
+
+  # Hadoop DataNode Servisi
+  datanode:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    container_name: datanode
+    restart: always
+    depends_on:
+      - namenode
+    volumes:
+      - ./hadoop/data/datanode:/hadoop/dfs/data
+      - ./hadoop/config:/hadoop/config
+    environment:
+      - SERVICE_PRECONDITION=namenode:9870
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:9000
+    env_file:
+      - ./hadoop/hadoop.env
+    networks:
+      - agri-network
+
+  # Spark Master Servisi
+  spark-master:
+    image: bitnami/spark:3.3.0
+    environment:
+      - SPARK_MODE=master
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+      - SPARK_MASTER_HOST=spark-master
+    ports:
+      - '8080:8080'
+      - '7077:7077'
+    volumes:
+      - ./data:/opt/bitnami/spark/data
+      - ./hadoop/config:/opt/hadoop/etc/hadoop
+    depends_on:
+      - namenode
+      - datanode
+    networks:
+      - agri-network
+
+  # Spark Worker Servisi
+  spark-worker:
+    image: bitnami/spark:3.3.0
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_WORKER_CORES=1
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    volumes:
+      - ./data:/opt/bitnami/spark/data
+      - ./hadoop/config:/opt/hadoop/etc/hadoop
+    depends_on:
+      - spark-master
+    networks:
+      - agri-network
+
+  # Flask Backend Servisi
+  flask-backend:
+    build:
+      context: ./backend
+    ports:
+      - '5000:5000'
+    volumes:
+      - ./backend:/app
+      - ./data:/app/data
+      - ./hadoop/config:/app/hadoop/config
+    environment:
+      - JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+    depends_on:
+      - spark-master
+      - namenode
+    networks:
+      - agri-network
+
+  # React Frontend Servisi
+  react-frontend:
+    build:
+      context: ./frontend
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - flask-backend
+    networks:
+      - agri-network
+
+networks:
+  agri-network:
+    driver: bridge

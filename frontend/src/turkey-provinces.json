@@ -1,0 +1,115 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 1,
+        "name": "Adana"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[35.3213, 37.0000], [35.5213, 37.0000], [35.5213, 37.2000], [35.3213, 37.2000], [35.3213, 37.0000]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 2,
+        "name": "Adıyaman"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[38.2786, 37.7648], [38.4786, 37.7648], [38.4786, 37.9648], [38.2786, 37.9648], [38.2786, 37.7648]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 3,
+        "name": "Afyonkarahisar"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[30.5567, 38.7507], [30.7567, 38.7507], [30.7567, 38.9507], [30.5567, 38.9507], [30.5567, 38.7507]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 6,
+        "name": "Ankara"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[32.8541, 39.9208], [33.0541, 39.9208], [33.0541, 40.1208], [32.8541, 40.1208], [32.8541, 39.9208]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 7,
+        "name": "Antalya"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[30.7056, 36.8841], [30.9056, 36.8841], [30.9056, 37.0841], [30.7056, 37.0841], [30.7056, 36.8841]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 34,
+        "name": "İstanbul"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[28.9784, 41.0082], [29.1784, 41.0082], [29.1784, 41.2082], [28.9784, 41.2082], [28.9784, 41.0082]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 35,
+        "name": "İzmir"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[27.1287, 38.4189], [27.3287, 38.4189], [27.3287, 38.6189], [27.1287, 38.6189], [27.1287, 38.4189]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 42,
+        "name": "Konya"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[32.4833, 37.8667], [32.6833, 37.8667], [32.6833, 38.0667], [32.4833, 38.0667], [32.4833, 37.8667]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 16,
+        "name": "Bursa"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[29.0610, 40.1885], [29.2610, 40.1885], [29.2610, 40.3885], [29.0610, 40.3885], [29.0610, 40.1885]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 27,
+        "name": "Gaziantep"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[37.3833, 37.0662], [37.5833, 37.0662], [37.5833, 37.2662], [37.3833, 37.2662], [37.3833, 37.0662]]]
+      }
+    }
+  ]
+}
