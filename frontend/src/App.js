@@ -12,6 +12,16 @@ function App() {
   const [error, setError] = useState(null);
   const [systemStatus, setSystemStatus] = useState({});
 
+  // Predict form state
+  const [predictForm, setPredictForm] = useState({
+    soil_ph: '',
+    rainfall_mm: '',
+    temperature_celsius: ''
+  });
+  const [predictResult, setPredictResult] = useState(null);
+  const [predictLoading, setPredictLoading] = useState(false);
+  const [predictError, setPredictError] = useState(null);
+
   // İlleri API'den yükle
   useEffect(() => {
     const fetchProvinces = async () => {
@@ -73,6 +83,55 @@ function App() {
   // İl seçimi işleyicisi
   const handleProvinceSelect = (e) => {
     setSelectedProvince(parseInt(e.target.value));
+  };
+
+  // Predict form input handler
+  const handlePredictInputChange = (e) => {
+    const { name, value } = e.target;
+    setPredictForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Predict form submit handler
+  const handlePredictSubmit = async (e) => {
+    e.preventDefault();
+
+    // Form validation
+    if (!predictForm.soil_ph || !predictForm.rainfall_mm || !predictForm.temperature_celsius) {
+      setPredictError('Lütfen tüm alanları doldurun');
+      return;
+    }
+
+    try {
+      setPredictLoading(true);
+      setPredictError(null);
+
+      const response = await axios.post('http://localhost:5000/api/predict', {
+        soil_ph: parseFloat(predictForm.soil_ph),
+        rainfall_mm: parseFloat(predictForm.rainfall_mm),
+        temperature_celsius: parseFloat(predictForm.temperature_celsius)
+      });
+
+      setPredictResult(response.data);
+      setPredictLoading(false);
+    } catch (err) {
+      setPredictError('Tahmin yapılırken bir hata oluştu');
+      setPredictLoading(false);
+      console.error('Predict error:', err);
+    }
+  };
+
+  // Reset predict form
+  const resetPredictForm = () => {
+    setPredictForm({
+      soil_ph: '',
+      rainfall_mm: '',
+      temperature_celsius: ''
+    });
+    setPredictResult(null);
+    setPredictError(null);
   };
 
   // GeoJSON stil fonksiyonu
@@ -190,6 +249,92 @@ function App() {
               </div>
             </div>
           )}
+
+          {/* Predict Form Section */}
+          <div className="predict-section">
+            <h2>Manuel Tahmin Yap</h2>
+            <p>Toprak pH, yağış ve sıcaklık değerlerini girerek hangi ile uygun olduğunu öğrenin</p>
+
+            <form onSubmit={handlePredictSubmit} className="predict-form">
+              <div className="form-group">
+                <label htmlFor="soil_ph">Toprak pH:</label>
+                <input
+                  type="number"
+                  id="soil_ph"
+                  name="soil_ph"
+                  value={predictForm.soil_ph}
+                  onChange={handlePredictInputChange}
+                  step="0.1"
+                  min="0"
+                  max="14"
+                  placeholder="Örnek: 6.5"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="rainfall_mm">Yağış (mm):</label>
+                <input
+                  type="number"
+                  id="rainfall_mm"
+                  name="rainfall_mm"
+                  value={predictForm.rainfall_mm}
+                  onChange={handlePredictInputChange}
+                  step="0.1"
+                  min="0"
+                  placeholder="Örnek: 500"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="temperature_celsius">Sıcaklık (°C):</label>
+                <input
+                  type="number"
+                  id="temperature_celsius"
+                  name="temperature_celsius"
+                  value={predictForm.temperature_celsius}
+                  onChange={handlePredictInputChange}
+                  step="0.1"
+                  placeholder="Örnek: 25"
+                  required
+                />
+              </div>
+
+              <div className="form-buttons">
+                <button type="submit" disabled={predictLoading} className="predict-button">
+                  {predictLoading ? 'Tahmin Yapılıyor...' : 'Tahmin Yap'}
+                </button>
+                <button type="button" onClick={resetPredictForm} className="reset-button">
+                  Temizle
+                </button>
+              </div>
+            </form>
+
+            {predictError && <p className="error">{predictError}</p>}
+
+            {predictResult && (
+              <div className="predict-result">
+                <h3>Tahmin Sonucu</h3>
+                <div className="result-card">
+                  <div className="result-item">
+                    <h4>Önerilen İl:</h4>
+                    <p className="result-value">{predictResult.predicted_province_name}</p>
+                  </div>
+                  <div className="result-item">
+                    <h4>İl ID:</h4>
+                    <p className="result-value">{predictResult.predicted_province_id}</p>
+                  </div>
+                  <div className="input-summary">
+                    <h4>Girilen Değerler:</h4>
+                    <p>pH: {predictResult.input_data.soil_ph}</p>
+                    <p>Yağış: {predictResult.input_data.rainfall_mm} mm</p>
+                    <p>Sıcaklık: {predictResult.input_data.temperature_celsius} °C</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

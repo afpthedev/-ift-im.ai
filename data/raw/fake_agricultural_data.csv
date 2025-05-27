@@ -1,82 +1,21 @@
-province_id,province_name,soil_ph,rainfall_mm,temperature_celsius,predicted_crop
-1,Adana,7.81,438,19.4,Mısır
-2,Adıyaman,6.84,410,20.7,Arpa
-3,Afyonkarahisar,6.51,319,16.7,Arpa
-4,Ağrı,6.75,541,12.6,Ayçiçeği
-5,Amasya,6.53,820,13.6,Mısır
-6,Ankara,7.32,379,16.4,Buğday
-7,Antalya,7.8,503,19.9,Pamuk
-8,Artvin,6.86,1141,12.7,Arpa
-9,Aydın,7.58,692,20.3,Mısır
-10,Balıkesir,6.3,432,13.3,Buğday
-11,Bilecik,6.28,1075,14.5,Çay
-12,Bingöl,6.79,483,16.4,Şeker Pancarı
-13,Bitlis,6.42,430,14.5,Buğday
-14,Bolu,6.29,669,9.6,Üzüm
-15,Burdur,6.88,609,16.2,Pamuk
-16,Bursa,5.98,1157,8.1,Fındık
-17,Çanakkale,6.53,660,14.3,Fındık
-18,Çankırı,5.54,1113,10.9,Çay
-19,Çorum,5.71,1173,10.3,Fındık
-20,Denizli,7.47,774,21.7,Mısır
-21,Diyarbakır,7.17,752,16.7,Buğday
-22,Edirne,5.79,911,14.0,Çay
-23,Elazığ,6.09,304,11.3,Buğday
-24,Erzincan,6.21,332,14.8,Şeker Pancarı
-25,Erzurum,7.2,358,12.3,Arpa
-26,Eskişehir,7.29,557,10.6,Şeker Pancarı
-27,Gaziantep,7.75,474,20.0,Mısır
-28,Giresun,5.94,732,14.8,Fındık
-29,Gümüşhane,6.82,786,12.9,Mısır
-30,Hakkari,6.92,643,15.1,Şeker Pancarı
-31,Hatay,7.18,769,18.6,Mısır
-32,Isparta,7.55,725,21.3,Pamuk
-33,Mersin,6.74,735,18.3,Ayçiçeği
-34,İstanbul,6.61,992,13.2,Mısır
-35,İzmir,6.35,359,13.3,Buğday
-36,Kars,6.31,848,11.8,Fındık
-37,Kastamonu,5.64,1036,8.1,Fındık
-38,Kayseri,7.06,579,17.0,Üzüm
-39,Kırklareli,5.62,833,9.8,Fındık
-40,Kırşehir,6.17,452,14.9,Şeker Pancarı
-41,Kocaeli,5.66,993,14.8,Fındık
-42,Konya,7.11,639,16.5,Fındık
-43,Kütahya,6.47,487,11.2,Buğday
-44,Malatya,7.31,454,15.8,Buğday
-45,Manisa,6.1,561,12.3,Arpa
-46,Kahramanmaraş,7.26,430,20.4,Mısır
-47,Mardin,7.11,470,17.1,Buğday
-48,Muğla,7.23,565,19.9,Pamuk
-49,Muş,7.28,450,12.4,Buğday
-50,Nevşehir,7.15,344,15.9,Buğday
-51,Niğde,6.7,790,17.1,Zeytin
-52,Ordu,6.55,648,9.6,Şeker Pancarı
-53,Rize,5.65,600,13.0,Çay
-54,Sakarya,6.76,768,9.2,Zeytin
-55,Samsun,6.96,919,9.4,Fındık
-56,Siirt,6.81,456,21.1,Şeker Pancarı
-57,Sinop,5.95,1165,12.8,Çay
-58,Sivas,6.28,594,14.9,Buğday
-59,Tekirdağ,6.3,670,12.6,Pamuk
-60,Tokat,6.87,803,8.3,Ayçiçeği
-61,Trabzon,5.96,1117,14.6,Fındık
-62,Tunceli,7.02,325,12.8,Arpa
-63,Şanlıurfa,7.22,706,16.3,Fındık
-64,Uşak,6.96,582,17.0,Çay
-65,Van,7.43,551,13.0,Arpa
-66,Yozgat,7.23,522,12.0,Arpa
-67,Zonguldak,6.94,1162,14.0,Şeker Pancarı
-68,Aksaray,7.41,413,16.6,Şeker Pancarı
-69,Bayburt,5.89,1081,8.8,Fındık
-70,Karaman,7.99,571,16.1,Arpa
-71,Kırıkkale,6.21,374,17.6,Buğday
-72,Batman,6.54,652,15.7,Pamuk
-73,Şırnak,7.61,516,18.9,Mısır
-74,Bartın,6.29,947,11.7,Çay
-75,Ardahan,6.56,1046,13.1,Pamuk
-76,Iğdır,6.62,395,13.4,Arpa
-77,Yalova,6.98,880,8.9,Mısır
-78,Karabük,6.53,1167,14.5,Arpa
-79,Kilis,7.06,462,16.2,Arpa
-80,Osmaniye,7.42,437,17.5,Buğday
-81,Düzce,5.65,853,8.2,Fındık
+soil_ph,rainfall_mm,temperature_celsius,crop
+6.1,450,18.0,Buğday
+7.3,300,22.5,Mısır
+5.8,600,15.0,Arpa
+6.7,520,20.0,Buğday
+7.0,480,19.0,Mısır
+6.4,700,17.5,Arpa
+7.8,250,25.0,Pirinç
+6.9,550,16.0,Buğday
+5.9,680,14.0,Arpa
+6.2,400,21.0,Mısır
+7.1,530,18.5,Buğday
+6.5,760,16.5,Arpa
+7.4,280,23.0,Pirinç
+6.8,610,17.0,Buğday
+5.7,720,15.5,Arpa
+7.2,350,24.0,Mısır
+6.6,580,19.5,Buğday
+7.5,260,26.0,Pirinç
+6.3,650,16.2,Arpa
+7.0,500,20.0,Buğday

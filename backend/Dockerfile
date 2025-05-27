@@ -29,6 +29,8 @@ RUN JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:/bin/java::") \
  && echo "export JAVA_HOME=$JAVA_HOME" >> /etc/profile.d/java.sh \
  && echo 'export PATH="$JAVA_HOME/bin:$PATH"' >> /etc/profile.d/java.sh
 
+
+
 # 5) Copy application code
 COPY . .
 
