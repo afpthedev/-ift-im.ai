@@ -1,0 +1,22 @@
+[debug] [2025-05-27T08:04:58.345Z] ----------------------------------------------------------------------
+[debug] [2025-05-27T08:04:58.353Z] Command:       /nix/store/rbdrkcs5kkwpalxcd7c6bnm33lk2955n-nodejs-20.19.0/bin/node /nix/store/x1y0l2xj62jgmz6csprhhqzibvdggdpk-firebase-tools-14.3.1/lib/node_modules/firebase-tools/lib/bin/firebase.js login --no-localhost
+[debug] [2025-05-27T08:04:58.354Z] CLI Version:   14.3.1
+[debug] [2025-05-27T08:04:58.354Z] Platform:      linux
+[debug] [2025-05-27T08:04:58.356Z] Node Version:  v20.19.0
+[debug] [2025-05-27T08:04:58.357Z] Time:          Tue May 27 2025 08:04:58 GMT+0000 (Coordinated Universal Time)
+[debug] [2025-05-27T08:04:58.357Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-05-27T08:04:58.365Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[info] i  Firebase optionally collects CLI and Emulator Suite usage and error reporting information to help improve our products. Data is collected in accordance with Google's privacy policy (https://policies.google.com/privacy) and is not used to identify you.
+ 
+[debug] [2025-05-27T08:04:58.800Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2025-05-27T08:04:58.801Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2025-05-27T08:05:02.181Z] ----------------------------------------------------------------------
+[debug] [2025-05-27T08:05:02.184Z] Command:       /nix/store/rbdrkcs5kkwpalxcd7c6bnm33lk2955n-nodejs-20.19.0/bin/node /nix/store/x1y0l2xj62jgmz6csprhhqzibvdggdpk-firebase-tools-14.3.1/lib/node_modules/firebase-tools/lib/bin/firebase.js init hosting
+[debug] [2025-05-27T08:05:02.185Z] CLI Version:   14.3.1
+[debug] [2025-05-27T08:05:02.185Z] Platform:      linux
+[debug] [2025-05-27T08:05:02.185Z] Node Version:  v20.19.0
+[debug] [2025-05-27T08:05:02.185Z] Time:          Tue May 27 2025 08:05:02 GMT+0000 (Coordinated Universal Time)
+[debug] [2025-05-27T08:05:02.186Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-05-27T08:05:02.192Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]

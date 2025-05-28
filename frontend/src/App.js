@@ -1,345 +1,224 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
+import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
 import 'leaflet/dist/leaflet.css';
 import turkeyGeoJson from './turkey-provinces.json';
+import About from './About'; // Eğer About.js’iniz yoksa bu satırı kaldırın
+
+
+// English -> Turkish map
+const cropMap = {
+  rice: 'Pirinç',
+  maize: 'Mısır',
+  chickpea: 'Nohut',
+  kidneybeans: 'Barbunya',
+  pigeonpeas: 'Bezelye',
+  mungbean: 'Mung Fasulyesi',
+  blackgram: 'Kara Fasulye',
+  lentil: 'Mercimek',
+  pomegranate: 'Nar',
+  banana: 'Muz',
+  mango: 'Mango',
+  grapes: 'Üzüm',
+  watermelon: 'Karpuz',
+  coconut: 'Hindistan Cevizi',
+  cotton: 'Pamuk',
+  muskmelon: 'Kavun',
+  apple: 'Elma'
+};
+
+const cropClasses = [
+  'apple','banana','blackgram','chickpea','grapes',
+  'kidneybeans','lentil','maize','mango','muskmelon',
+  'coconut','cotton','pomegranate','rice','watermelon'
+];
 
 function App() {
   const [provinces, setProvinces] = useState([]);
   const [selectedProvince, setSelectedProvince] = useState(null);
   const [provinceData, setProvinceData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [systemStatus, setSystemStatus] = useState({});
+  const [accuracy, setAccuracy] = useState(null);
 
-  // Predict form state
   const [predictForm, setPredictForm] = useState({
-    soil_ph: '',
-    rainfall_mm: '',
-    temperature_celsius: ''
+    soil_ph: '', rainfall_mm: '', temperature_celsius: ''
   });
   const [predictResult, setPredictResult] = useState(null);
   const [predictLoading, setPredictLoading] = useState(false);
   const [predictError, setPredictError] = useState(null);
 
-  // İlleri API'den yükle
   useEffect(() => {
-    const fetchProvinces = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get('http://localhost:5000/api/provinces');
-        setProvinces(response.data);
-        setLoading(false);
-      } catch (err) {
-        setError('İller yüklenirken bir hata oluştu');
-        setLoading(false);
-        console.error('İller yüklenirken hata:', err);
-      }
-    };
+    axios.get('/api/provinces')
+      .then(res => setProvinces(res.data))
+      .catch(err => console.error(err));
 
-    fetchProvinces();
-
-    // Sistem durumunu kontrol et
-    const checkSystemStatus = async () => {
-      try {
-        const healthResponse = await axios.get('http://localhost:5000/api/health');
-        const hadoopResponse = await axios.get('http://localhost:5000/api/hadoop/status');
-
-        setSystemStatus({
-          api: healthResponse.data,
-          hadoop: hadoopResponse.data
-        });
-      } catch (err) {
-        console.error('Sistem durumu kontrol edilirken hata:', err);
-        setSystemStatus({
-          error: 'Sistem durumu kontrol edilirken hata oluştu'
-        });
-      }
-    };
-
-    checkSystemStatus();
+    Promise.all([
+      axios.get('/api/health'),
+      axios.get('/api/hadoop/status'),
+      axios.get('/api/accuracy')
+    ]).then(([h, h2, acc]) => {
+      setSystemStatus({ api: h.data, hadoop: h2.data });
+      setAccuracy(acc.data.accuracy);
+    }).catch(err => console.error(err));
   }, []);
 
-  // Seçilen il değiştiğinde il verilerini yükle
   useEffect(() => {
-    const fetchProvinceData = async () => {
-      if (!selectedProvince) return;
-
-      try {
-        setLoading(true);
-        const response = await axios.get(`http://localhost:5000/api/province/${selectedProvince}`);
-        setProvinceData(response.data);
-        setLoading(false);
-      } catch (err) {
-        setError('İl verileri yüklenirken bir hata oluştu');
-        setLoading(false);
-        console.error('İl verileri yüklenirken hata:', err);
-      }
-    };
-
-    fetchProvinceData();
+    if (!selectedProvince) return;
+    setLoading(true);
+    axios.get(`/api/province/${selectedProvince}`)
+      .then(res => {
+        setProvinceData(res.data);
+        setError(null);
+      })
+      .catch(() => setError('İl verisi yüklenirken hata oluştu'))
+      .finally(() => setLoading(false));
   }, [selectedProvince]);
 
-  // İl seçimi işleyicisi
-  const handleProvinceSelect = (e) => {
-    setSelectedProvince(parseInt(e.target.value));
+  const handleProvinceSelect = e => {
+    setSelectedProvince(e.target.value);
+    setProvinceData(null);
   };
 
-  // Predict form input handler
-  const handlePredictInputChange = (e) => {
+  const handlePredictChange = e => {
     const { name, value } = e.target;
-    setPredictForm(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setPredictForm(f => ({ ...f, [name]: value }));
   };
 
-  // Predict form submit handler
-  const handlePredictSubmit = async (e) => {
+  const handlePredictSubmit = e => {
     e.preventDefault();
-
-    // Form validation
-    if (!predictForm.soil_ph || !predictForm.rainfall_mm || !predictForm.temperature_celsius) {
+    const { soil_ph, rainfall_mm, temperature_celsius } = predictForm;
+    if (!soil_ph || !rainfall_mm || !temperature_celsius) {
       setPredictError('Lütfen tüm alanları doldurun');
       return;
     }
-
-    try {
-      setPredictLoading(true);
-      setPredictError(null);
-
-      const response = await axios.post('http://localhost:5000/api/predict', {
-        soil_ph: parseFloat(predictForm.soil_ph),
-        rainfall_mm: parseFloat(predictForm.rainfall_mm),
-        temperature_celsius: parseFloat(predictForm.temperature_celsius)
-      });
-
-      setPredictResult(response.data);
-      setPredictLoading(false);
-    } catch (err) {
-      setPredictError('Tahmin yapılırken bir hata oluştu');
-      setPredictLoading(false);
-      console.error('Predict error:', err);
-    }
+    setPredictLoading(true);
+    axios.post('/api/predict', {
+      soil_ph: +soil_ph,
+      rainfall_mm: +rainfall_mm,
+      temperature_celsius: +temperature_celsius
+    })
+      .then(res => {
+        setPredictResult(res.data);
+        setPredictError(null);
+      })
+      .catch(() => setPredictError('Tahmin başarısız'))
+      .finally(() => setPredictLoading(false));
   };
 
-  // Reset predict form
-  const resetPredictForm = () => {
-    setPredictForm({
-      soil_ph: '',
-      rainfall_mm: '',
-      temperature_celsius: ''
-    });
+  const resetPredict = () => {
+    setPredictForm({ soil_ph: '', rainfall_mm: '', temperature_celsius: '' });
     setPredictResult(null);
     setPredictError(null);
   };
 
-  // GeoJSON stil fonksiyonu
-  const provinceStyle = (feature) => {
-    const provinceId = feature.properties.id;
-    return {
-      fillColor: selectedProvince === provinceId ? '#4CAF50' : '#3388ff',
-      weight: 2,
-      opacity: 1,
-      color: 'white',
-      dashArray: '3',
-      fillOpacity: 0.7
-    };
-  };
+  const provinceStyle = f => ({
+    fillColor: selectedProvince === f.properties.id ? '#4CAF50' : '#3388ff',
+    weight: 2, opacity: 1, color: 'white', dashArray: '3', fillOpacity: 0.7
+  });
 
-  // GeoJSON tıklama işleyicisi
   const onEachFeature = (feature, layer) => {
-    const provinceId = feature.properties.id;
-    const provinceName = feature.properties.name;
-
-    layer.on({
-      click: () => {
-        setSelectedProvince(provinceId);
-      }
-    });
-
-    layer.bindTooltip(provinceName);
+    layer.on({ click: () => setSelectedProvince(feature.properties.id) });
+    layer.bindTooltip(feature.properties.name);
   };
 
   return (
     <div className="App">
-      <header className="App-header">
+      <header>
         <h1>Tarım Tahmin Uygulaması</h1>
-        <p>Türkiye haritasından bir il seçerek tarımsal verileri ve ürün tahminlerini görüntüleyin</p>
+        <nav>
+          <NavLink to="/" end>Ana Sayfa</NavLink>
+          <NavLink to="/about">Proje Nedir?</NavLink>
+        </nav>
       </header>
 
-      <div className="system-status">
-        <h3>Sistem Durumu</h3>
-        {systemStatus.error ? (
-          <p className="error">{systemStatus.error}</p>
-        ) : (
-          <div className="status-container">
-            <div className="status-item">
-              <span>API:</span>
-              <span className={systemStatus.api?.status === "healthy" ? "status-ok" : "status-error"}>
-                {systemStatus.api?.status === "healthy" ? "Çalışıyor" : "Hata"}
-              </span>
-            </div>
-            <div className="status-item">
-              <span>Hadoop:</span>
-              <span className={systemStatus.hadoop?.status === "connected" ? "status-ok" : "status-error"}>
-                {systemStatus.hadoop?.status === "connected" ? "Bağlı" : "Bağlantı Hatası"}
-              </span>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="container">
-        <div className="map-container">
-          <MapContainer
-            center={[39.0, 35.0]}
-            zoom={6}
-            style={{ height: '500px', width: '100%' }}
-          >
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            />
-            <GeoJSON
-              data={turkeyGeoJson}
-              style={provinceStyle}
-              onEachFeature={onEachFeature}
-            />
-          </MapContainer>
-        </div>
-
-        <div className="data-container">
-          <div className="province-selector">
-            <h2>İl Seçimi</h2>
-            <select onChange={handleProvinceSelect} value={selectedProvince || ''}>
-              <option value="">İl seçiniz</option>
-              {provinces.map(province => (
-                <option key={province.province_id} value={province.province_id}>
-                  {province.province_name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {loading && <p>Yükleniyor...</p>}
-          {error && <p className="error">{error}</p>}
-
-          {provinceData && !loading && (
-            <div className="province-data">
-              <h2>{provinceData.province_name} İli Tarım Verileri</h2>
-              <div className="data-card">
-                <div className="data-item">
-                  <h3>Toprak pH</h3>
-                  <p className="data-value">{provinceData.soil_ph}</p>
-                </div>
-                <div className="data-item">
-                  <h3>Yağış (mm)</h3>
-                  <p className="data-value">{provinceData.rainfall_mm}</p>
-                </div>
-                <div className="data-item">
-                  <h3>Sıcaklık (°C)</h3>
-                  <p className="data-value">{provinceData.temperature_celsius}</p>
-                </div>
-              </div>
-
-              <div className="prediction-card">
-                <h3>Önerilen Ürün</h3>
-                <p className="prediction">{provinceData.predicted_crop}</p>
-              </div>
-            </div>
-          )}
-
-          {/* Predict Form Section */}
-          <div className="predict-section">
-            <h2>Manuel Tahmin Yap</h2>
-            <p>Toprak pH, yağış ve sıcaklık değerlerini girerek hangi ile uygun olduğunu öğrenin</p>
-
-            <form onSubmit={handlePredictSubmit} className="predict-form">
-              <div className="form-group">
-                <label htmlFor="soil_ph">Toprak pH:</label>
-                <input
-                  type="number"
-                  id="soil_ph"
-                  name="soil_ph"
-                  value={predictForm.soil_ph}
-                  onChange={handlePredictInputChange}
-                  step="0.1"
-                  min="0"
-                  max="14"
-                  placeholder="Örnek: 6.5"
-                  required
+      <Routes>
+        <Route path="/" element={
+          <main>
+            <section className="map">
+              <MapContainer center={[39,35]} zoom={6} style={{height:400}}>
+                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                <GeoJSON 
+                  data={turkeyGeoJson} 
+                  style={provinceStyle} 
+                  onEachFeature={onEachFeature} 
                 />
-              </div>
+              </MapContainer>
+            </section>
 
-              <div className="form-group">
-                <label htmlFor="rainfall_mm">Yağış (mm):</label>
-                <input
-                  type="number"
-                  id="rainfall_mm"
-                  name="rainfall_mm"
-                  value={predictForm.rainfall_mm}
-                  onChange={handlePredictInputChange}
-                  step="0.1"
-                  min="0"
-                  placeholder="Örnek: 500"
-                  required
-                />
-              </div>
+            <section className="data">
+              <h2>İl Seçimi</h2>
+              <select onChange={handleProvinceSelect} value={selectedProvince||''}>
+                <option value="">-- Seçiniz --</option>
+                {provinces.map(p =>
+                  <option key={p.province_id} value={p.province_id}>
+                    {p.province_name}
+                  </option>
+                )}
+              </select>
 
-              <div className="form-group">
-                <label htmlFor="temperature_celsius">Sıcaklık (°C):</label>
-                <input
-                  type="number"
-                  id="temperature_celsius"
-                  name="temperature_celsius"
-                  value={predictForm.temperature_celsius}
-                  onChange={handlePredictInputChange}
-                  step="0.1"
-                  placeholder="Örnek: 25"
-                  required
-                />
-              </div>
+              {loading && <p>Yükleniyor...</p>}
+              {error && <p className="error">{error}</p>}
 
-              <div className="form-buttons">
-                <button type="submit" disabled={predictLoading} className="predict-button">
-                  {predictLoading ? 'Tahmin Yapılıyor...' : 'Tahmin Yap'}
+              {provinceData && (
+                <div>
+                  <h3>{provinceData.province_name}</h3>
+                  <p>pH: {provinceData.soil_ph}</p>
+                  <p>Yağış: {provinceData.rainfall_mm} mm</p>
+                  <p>Sıcaklık: {provinceData.temperature_celsius} °C</p>
+                  <p><strong>Ürün:</strong> {
+                    cropMap[cropClasses[provinceData.recommended_crop]] 
+                    || cropClasses[provinceData.recommended_crop]
+                  }</p>
+                </div>
+              )}
+            </section>
+
+            <section className="predict">
+              <h2>Manuel Tahmin</h2>
+              <form onSubmit={handlePredictSubmit}>
+                {['soil_ph','rainfall_mm','temperature_celsius'].map(name => (
+                  <div key={name}>
+                    <label htmlFor={name}>{name.replace('_',' ')}</label>
+                    <input
+                      id={name}
+                      name={name}
+                      type="number"
+                      step="0.1"
+                      value={predictForm[name]}
+                      onChange={handlePredictChange}
+                      required
+                    />
+                  </div>
+                ))}
+                <button type="submit" disabled={predictLoading}>
+                  {predictLoading ? 'Tahmin...' : 'Tahmin Yap'}
                 </button>
-                <button type="button" onClick={resetPredictForm} className="reset-button">
-                  Temizle
-                </button>
-              </div>
-            </form>
-
-            {predictError && <p className="error">{predictError}</p>}
-
-            {predictResult && (
-              <div className="predict-result">
-                <h3>Tahmin Sonucu</h3>
-                <div className="result-card">
-                  <div className="result-item">
-                    <h4>Önerilen İl:</h4>
-                    <p className="result-value">{predictResult.predicted_province_name}</p>
-                  </div>
-                  <div className="result-item">
-                    <h4>İl ID:</h4>
-                    <p className="result-value">{predictResult.predicted_province_id}</p>
-                  </div>
-                  <div className="input-summary">
-                    <h4>Girilen Değerler:</h4>
-                    <p>pH: {predictResult.input_data.soil_ph}</p>
-                    <p>Yağış: {predictResult.input_data.rainfall_mm} mm</p>
-                    <p>Sıcaklık: {predictResult.input_data.temperature_celsius} °C</p>
-                  </div>
+                <button type="button" onClick={resetPredict}>Temizle</button>
+              </form>
+              {predictError && <p className="error">{predictError}</p>}
+              {predictResult && (
+                <div>
+                  <h3>Sonuç: {
+                    cropMap[cropClasses[predictResult.predicted_crop]] 
+                    || cropClasses[predictResult.predicted_crop]
+                  }</h3>
+                  <p>pH: {predictResult.input.soil_ph}</p>
+                  <p>Yağış: {predictResult.input.rainfall_mm}</p>
+                  <p>Sıcaklık: {predictResult.input.temperature_celsius}</p>
                 </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+              )}
+            </section>
+          </main>
+        }/>
 
-      <footer className="App-footer">
-        <p>Hadoop, Spark, Flask ve React ile geliştirilmiş Tarım Tahmin Uygulaması &copy; 2025</p>
+        <Route path="/about" element={<About />} />
+      </Routes>
+
+      <footer>
+        <p>Hadoop, Spark, Flask & React © 2025</p>
       </footer>
     </div>
   );
