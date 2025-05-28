@@ -43,9 +43,6 @@ function About() {
           </p>
         </div>
       </div>
-      <footer className="App-footer">
-        <p>Hadoop, Spark, Flask & React ile Tarım Tahmin © 2025</p>
-      </footer>
     </div>
   );
 }

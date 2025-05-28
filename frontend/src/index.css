@@ -1,13 +1,32 @@
-/* index.css - Retro Global Styles (Güncellenmiş İl Seçimi ve Formlar) */
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+/* index.css – Elegant Global Styles */
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap');
 
-html, body {
+:root {
+  --color-bg: #f9f9f9;
+  --color-card: #ffffff;
+  --color-text: #333333;
+  --color-secondary: #666666;
+  --color-primary: #4a90e2;
+  --color-primary-light: #6faef7;
+  --color-error-bg: #ffe6e6;
+  --color-error-text: #c0392b;
+  --shadow-light: 0 2px 4px rgba(0, 0, 0, 0.08);
+  --radius: 8px;
+  --spacing: 1rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
   margin: 0;
   padding: 0;
   height: 100%;
-  background: #000;
-  font-family: 'Press Start 2P', monospace;
-  color: #0ff;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Lato', sans-serif;
+  line-height: 1.6;
 }
 
 body {
@@ -15,231 +34,244 @@ body {
   flex-direction: column;
 }
 
-#root {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Uygulama kapsayıcısı */
 .App {
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: calc(var(--spacing) * 2);
 }
 
-/* Başlık */
+/* Header */
 .App-header {
-  background-color: #111;
-  border-bottom: 2px solid #0ff;
-  padding: 20px;
+  background-color: var(--color-card);
+  padding: calc(var(--spacing) * 2) calc(var(--spacing));
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-light);
   text-align: center;
+  margin-bottom: calc(var(--spacing) * 2);
 }
 .App-header h1 {
-  margin: 0 0 8px;
-  font-size: 1.8rem;
-  text-shadow: 2px 2px #f0f;
+  margin: 0 0 0.5rem;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-primary);
 }
 .App-header p {
   margin: 0;
-  font-size: 0.8rem;
-  opacity: 0.8;
+  font-size: 1rem;
+  color: var(--color-secondary);
 }
 
-/* Ana içerik 2 kolonlu düzen */
-.container {
-  flex: 1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  padding: 20px;
-}
-
-/* Harita panosu */
-.map-container {
-  border: 3px solid #0ff;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-/* Veri panosu */
-.data-container {
+/* Navigation */
+.main-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: calc(var(--spacing) * 1) 0;
   display: flex;
-  flex-direction: column;
-  gap: 20px;
+  justify-content: center;
+  gap: calc(var(--spacing) * 2);
+}
+.main-nav a {
+  text-decoration: none;
+  color: var(--color-text);
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.main-nav a:hover,
+.main-nav a.active {
+  color: var(--color-primary);
 }
 
-/* Genel panel stili */
-.system-status,
+/* System Status */
+.system-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing);
+  background-color: var(--color-card);
+  padding: var(--spacing);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-light);
+  margin-bottom: calc(var(--spacing) * 2);
+  font-size: 0.9rem;
+}
+.status-item span.status-ok {
+  color: #27ae60;
+  font-weight: 700;
+}
+.status-item span.status-error {
+  color: var(--color-error-text);
+  font-weight: 700;
+}
+
+/* Layout Grid */
+.container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: calc(var(--spacing) * 2);
+  margin-bottom: calc(var(--spacing) * 2);
+}
+
+/* Map Full Width */
+.fullwidth-map {
+  grid-column: 1 / -1;
+  background-color: var(--color-card);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-light);
+  height: 500px;
+}
+.map-container {
+  width: 100%;
+  height: 100%;
+}
+
+/* Panels */
 .province-selector,
 .province-data,
 .predict-section,
 .App-footer {
-  background: rgba(0,0,0,0.8);
-  border: 2px dashed #0ff;
-  padding: 15px;
-  border-radius: 4px;
+  background-color: var(--color-card);
+  padding: var(--spacing);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-light);
 }
 
-/* İl Seçimi stili */
-.province-selector h2 {
+/* Province Selector */
+.province-selector h2,
+.province-data h2,
+.predict-section h2 {
   margin-top: 0;
+  font-size: 1.25rem;
+  color: var(--color-primary);
+}
+.province-selector select,
+.predict-form input {
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: var(--radius);
   font-size: 1rem;
-  color: #0ff;
-  text-shadow: 1px 1px #004;
-}
-.province-selector .form-group {
-  display: flex;
-  flex-direction: column;
-  margin-top: 10px;
-}
-.province-selector .form-group label {
-  margin-bottom: 6px;
-  color: #0ff;
-  font-size: 0.75rem;
-  text-shadow: 1px 1px #004;
-  text-transform: uppercase;
-}
-.province-selector .form-group select {
-  background: #111;
-  color: #0ff;
-  border: 2px solid #0ff;
-  border-radius: 2px;
-  padding: 8px;
-  font-size: 0.75rem;
-  font-family: 'Press Start 2P', monospace;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-.province-selector .form-group select:focus {
-  outline: none;
-  border-color: #f0f;
-  box-shadow: 0 0 6px #0ff;
+  color: var(--color-text);
+  background: #fafafa;
 }
 
-/* Form bölümü geliştirilmiş */
-.predict-section .predict-form {
+/* Data Cards */
+.data-card,
+.result-card {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 10px;
-}
-.predict-section .form-group {
-  display: flex;
-  flex-direction: column;
-  text-align: left;
-}
-.predict-section .form-group label {
-  margin-bottom: 6px;
-  color: #0ff;
-  font-size: 0.75rem;
-  text-shadow: 1px 1px #004;
-}
-.predict-section .form-group input {
-  background: #111;
-  color: #0ff;
-  border: 2px solid #0ff;
-  border-radius: 2px;
-  padding: 8px;
-  font-size: 0.75rem;
-  font-family: 'Press Start 2P', monospace;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-.predict-section .form-group input:focus {
-  outline: none;
-  border-color: #f0f;
-  box-shadow: 0 0 6px #0ff;
-}
-
-/* Form butonları */
-.predict-section .form-buttons {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 10px;
-}
-.predict-section .predict-button,
-.predict-section .reset-button {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 0.75rem;
-  padding: 10px 20px;
-  border: none;
-  background: #0ff;
-  color: #000;
-  border-radius: 2px;
-  cursor: pointer;
-  text-transform: uppercase;
-  transition: background 0.2s, color 0.2s;
-}
-.predict-section .predict-button:hover:not(:disabled),
-.predict-section .reset-button:hover {
-  background: #f0f;
-  color: #000;
-}
-.predict-section .predict-button:disabled {
-  background: #555;
-  cursor: not-allowed;
-}
-
-/* Prediction sonuç kartları */
-.province-data .data-card,
-.predict-result .result-card {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 10px;
+  gap: var(--spacing);
+  flex-wrap: wrap;
 }
 .data-item,
 .result-item {
-  background: #111;
-  border: 2px solid #0ff;
-  border-radius: 2px;
-  padding: 10px;
-  text-transform: uppercase;
+  flex: 1 1 120px;
+  background: var(--color-bg);
+  padding: var(--spacing);
+  border-radius: var(--radius);
+  text-align: center;
 }
 .data-item h3,
 .result-item h4 {
-  margin: 0 0 6px;
-  font-size: 0.75rem;
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+  color: var(--color-secondary);
 }
 .data-value,
 .result-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+/* Prediction Card */
+.prediction-card {
+  text-align: center;
+  margin-top: var(--spacing);
+}
+.prediction-card h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  color: var(--color-text);
+}
+.prediction {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+/* Predict Form */
+.predict-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+}
+.form-buttons {
+  display: flex;
+  gap: var(--spacing);
+  margin-top: var(--spacing);
+}
+.predict-button,
+.reset-button {
+  flex: 1;
+  padding: 0.75rem;
   font-size: 1rem;
-  color: #0f0;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+.predict-button {
+  background-color: var(--color-primary);
+  color: #fff;
+}
+.predict-button:hover {
+  background-color: var(--color-primary-light);
+}
+.reset-button {
+  background-color: #eee;
+  color: var(--color-text);
+}
+.reset-button:hover {
+  background-color: #ddd;
+}
+
+/* Error */
+.error {
+  background-color: var(--color-error-bg);
+  color: var(--color-error-text);
+  padding: var(--spacing);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
 }
 
 /* Footer */
 .App-footer {
   text-align: center;
-  font-size: 0.6rem;
+  padding: calc(var(--spacing) * 2) 0;
+  color: var(--color-secondary);
+  font-size: 0.9rem;
+  border-top: 1px solid #e0e0e0;
   margin-top: auto;
-  border-top: none;
 }
 
-/* Linkler */
+/* Links */
 a {
-  color: #0ff;
+  color: var(--color-primary);
   text-decoration: none;
   transition: color 0.2s;
 }
 a:hover {
-  color: #f0f;
-}
-
-/* Scrollbar retro tarz */
-::-webkit-scrollbar {
-  width: 8px;
-  background: #111;
-}
-::-webkit-scrollbar-thumb {
-  background-color: #0ff;
-  border-radius: 4px;
-  border: 2px solid #111;
+  color: var(--color-primary-light);
 }
 
 /* Responsive */
 @media (max-width: 768px) {
   .container {
     grid-template-columns: 1fr;
-    padding: 10px;
+    padding: var(--spacing);
   }
 }
