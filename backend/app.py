@@ -155,17 +155,36 @@ def predict_crop():
     }
     missing = [c for c in FEATURE_COLS if data.get(c) is None]
     if missing:
-        return jsonify({'error': f'Missing features: {missing}'}), 400
+        return jsonify({'error': f'Missing features: {missing}', 'success': False}), 400
     try:
         features = [[float(data[c]) for c in FEATURE_COLS]]
     except ValueError:
-        return jsonify({'error': 'Feature values must be numeric'}), 400
+        return jsonify({'error': 'Feature values must be numeric', 'success': False}), 400
     try:
         pred = nb_model.predict(features)[0]
+        # Get model accuracy from the get_accuracy function
+        df = pd.read_csv(CSV_DATA_PATH)
+        df = df.rename(columns={
+            'ph': 'soil_ph',
+            'rainfall': 'rainfall_mm',
+            'temperature': 'temperature_celsius'
+        })
+        accuracy = nb_model.score(df[FEATURE_COLS], df[LABEL_COL])
+        model_accuracy = round(accuracy * 100, 2)
+        
+        # Add confidence level based on accuracy (simplified)
+        confidence_level = "Yüksek" if model_accuracy > 85 else "Orta" if model_accuracy > 70 else "Düşük"
+        
+        return jsonify({
+            'success': True,
+            'predicted_crop_name': pred,
+            'model_accuracy': model_accuracy,
+            'confidence': confidence_level,
+            'input': data
+        })
     except Exception as e:
         app.logger.error(f"Prediction error: {e}")
-        return jsonify({'error': 'Prediction failed'}), 500
-    return jsonify({'predicted_crop': pred, 'input': data})
+        return jsonify({'error': 'Prediction failed', 'success': False}), 500
 
 @app.route('/api/health', methods=['GET'])
 def health_check():
