@@ -1,16 +1,13 @@
 FROM node:16-alpine
-
 WORKDIR /app
 
 COPY package*.json ./
-
 RUN npm install
-
-# 3) Install lucide-react
-RUN npm install --save lucide-react
-
+RUN npm install --save lucide-react react-router-dom@6
 COPY . .
 
-EXPOSE 3000
+# disable CRA opening a browser
+ENV BROWSER=none
 
+EXPOSE 3000
 CMD ["npm", "start"]

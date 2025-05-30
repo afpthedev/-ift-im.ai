@@ -18,6 +18,5 @@ RUN JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:/bin/java::") \
 
 # Copy your Python app
 COPY . .
-
 EXPOSE 5000
 CMD ["python", "app.py"]

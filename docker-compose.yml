@@ -91,7 +91,7 @@ services:
       - '5000:5000'
     volumes:
       - ./backend:/app
-      - ./data:/app/data
+      - ./backend/data:/app/data
       - ./hadoop/config:/app/hadoop/config
     depends_on:
       - spark-master
@@ -107,7 +107,7 @@ services:
       - '3000:3000'
     volumes:
       - ./frontend:/app
-      - /app/node_modules
+      - ./frontend/node_modules:/app/node_modules
     depends_on:
       - flask-backend
     networks:

@@ -1,3 +1,4 @@
+# backend/app.py
 import os
 import pickle
 import requests
@@ -7,22 +8,18 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from pyspark.sql import SparkSession
 from sklearn.naive_bayes import GaussianNB
-from sklearn.metrics import accuracy_score
 
 # --- Configuration ---
 BASE_DIR = os.getcwd()
-CSV_DATA_PATH   = os.path.join(BASE_DIR, "data", "crop_recommendation.csv")
-MODEL_PATH      = os.path.join(BASE_DIR, "data", "models", "naive_bayes_model.pkl")
+CSV_DATA_PATH = os.path.join(BASE_DIR, "data", "crop_recommendation.csv")
+MODEL_PATH    = os.path.join(BASE_DIR, "data", "models", "naive_bayes_model.pkl")
 
-# These are the names we’ll use inside the model
 FEATURE_COLS = ['soil_ph', 'rainfall_mm', 'temperature_celsius']
 LABEL_COL    = 'label'
 
-# HDFS / local fallback
 HDFS_DATA_PATH  = "hdfs://namenode:9000/user/hadoop/agri_predict/raw/fake_agricultural_data.csv"
 LOCAL_DATA_PATH = os.path.join(BASE_DIR, "data", "raw", "fake_agricultural_data.csv")
 
-# Weather API
 WEATHERSTACK_KEY = 'ff78c869ec8eb45895ed86afcf2d08c9'
 WEATHER_API_URL  = 'http://api.weatherstack.com/current'
 
@@ -30,7 +27,7 @@ WEATHER_API_URL  = 'http://api.weatherstack.com/current'
 app = Flask(__name__)
 CORS(app)
 
-# --- Spark session (for soil data) ---
+# --- Spark session ---
 spark = None
 def create_spark_session():
     global spark
@@ -42,7 +39,7 @@ def create_spark_session():
     return spark
 
 def load_soil_data():
-    """Load soil data from HDFS; if that fails, read a local CSV fallback."""
+    """Try HDFS first, fallback to local CSV."""
     try:
         sdf = create_spark_session().read.csv(HDFS_DATA_PATH, header=True, inferSchema=True)
         df = sdf.toPandas()
@@ -57,43 +54,29 @@ def load_soil_data():
             df = pd.DataFrame()
     return df
 
-# --- Naive Bayes model persistence ---
+# --- Model persistence ---
 nb_model = None
 
 def train_and_persist_model():
-    """Train GaussianNB on our CSV and save it to disk."""
     global nb_model
-
-    # 1) Load raw CSV
     df = pd.read_csv(CSV_DATA_PATH)
-
-    # 2) Rename to match FEATURE_COLS
     df = df.rename(columns={
         'ph': 'soil_ph',
         'rainfall': 'rainfall_mm',
         'temperature': 'temperature_celsius'
     })
-
-    # 3) Verify all required columns are present
     missing = [c for c in FEATURE_COLS + [LABEL_COL] if c not in df.columns]
     if missing:
         raise ValueError(f"Missing columns after rename: {missing}")
-
-    # 4) Train
     X = df[FEATURE_COLS]
     y = df[LABEL_COL]
-    nb_model = GaussianNB()
-    nb_model.fit(X, y)
-
-    # 5) Persist to disk
+    nb_model = GaussianNB().fit(X, y)
     os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
     with open(MODEL_PATH, 'wb') as f:
         pickle.dump(nb_model, f)
-
     app.logger.info("Trained and saved Naive Bayes model.")
 
 def load_model():
-    """Load the model from disk, or train it if not present."""
     global nb_model
     if nb_model is not None:
         return
@@ -104,12 +87,10 @@ def load_model():
     else:
         train_and_persist_model()
 
-# Bootstrap on startup
 with app.app_context():
     load_model()
 
-# --- API Endpoints ---
-
+# --- Endpoints ---
 @app.route('/api/provinces', methods=['GET'])
 def get_provinces():
     df = load_soil_data()
@@ -128,7 +109,7 @@ def get_province_data(province_id):
     soil_ph = float(row.iloc[0]['soil_ph'])
     province_name = row.iloc[0]['province_name']
 
-    # Fetch live weather
+    # Weather
     try:
         resp = requests.get(WEATHER_API_URL, params={
             'access_key': WEATHERSTACK_KEY,
@@ -142,7 +123,6 @@ def get_province_data(province_id):
         temperature = None
         rainfall = None
 
-    # Predict
     load_model()
     features = [[
         soil_ph,
@@ -167,34 +147,24 @@ def get_province_data(province_id):
 @app.route('/api/predict', methods=['POST'])
 def predict_crop():
     load_model()
-
-    try:
-        payload = request.get_json(force=True)
-    except Exception:
-        return jsonify({'error': 'Invalid JSON payload'}), 400
-
-    # Allow either old keys or new ones
+    payload = request.get_json(force=True)
     data = {
         'soil_ph': payload.get('ph', payload.get('soil_ph')),
         'rainfall_mm': payload.get('rainfall', payload.get('rainfall_mm')),
         'temperature_celsius': payload.get('temperature', payload.get('temperature_celsius')),
     }
-
     missing = [c for c in FEATURE_COLS if data.get(c) is None]
     if missing:
         return jsonify({'error': f'Missing features: {missing}'}), 400
-
     try:
         features = [[float(data[c]) for c in FEATURE_COLS]]
     except ValueError:
         return jsonify({'error': 'Feature values must be numeric'}), 400
-
     try:
         pred = nb_model.predict(features)[0]
     except Exception as e:
         app.logger.error(f"Prediction error: {e}")
         return jsonify({'error': 'Prediction failed'}), 500
-
     return jsonify({'predicted_crop': pred, 'input': data})
 
 @app.route('/api/health', methods=['GET'])
@@ -209,9 +179,7 @@ def get_accuracy():
         'rainfall': 'rainfall_mm',
         'temperature': 'temperature_celsius'
     })
-    X = df[FEATURE_COLS]
-    y = df[LABEL_COL]
-    score = nb_model.score(X, y)
+    score = nb_model.score(df[FEATURE_COLS], df[LABEL_COL])
     return jsonify({'accuracy': round(score * 100, 2)})
 
 @app.route('/api/hadoop/status', methods=['GET'])
