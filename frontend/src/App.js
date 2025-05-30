@@ -4,8 +4,7 @@ import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
 import { Routes, Route, NavLink } from 'react-router-dom';
 import 'leaflet/dist/leaflet.css';
 import turkeyGeoJson from './turkey-provinces.json';
-import About from './About'; // Eğer About.js’iniz yoksa bu satırı kaldırın
-
+import About from './About'; // Eğer About.js'iniz yoksa bu satırı kaldırın
 
 // English -> Turkish map
 const cropMap = {
@@ -25,7 +24,8 @@ const cropMap = {
   coconut: 'Hindistan Cevizi',
   cotton: 'Pamuk',
   muskmelon: 'Kavun',
-  apple: 'Elma'
+  apple: 'Elma',
+  mothbeans : 'Güve Fasulyesi'
 };
 
 // LabelEncoder.classes_ (alphabetical) -> index mapping
@@ -44,8 +44,11 @@ function App() {
   const [systemStatus, setSystemStatus] = useState({});
   const [accuracy, setAccuracy] = useState(null);
 
-
-  const [predictForm, setPredictForm] = useState({ soil_ph: '', rainfall_mm: '', temperature_celsius: '' });
+  const [predictForm, setPredictForm] = useState({
+    soil_ph: '',
+    rainfall_mm: '',
+    temperature_celsius: ''
+  });
   const [predictResult, setPredictResult] = useState(null);
   const [predictLoading, setPredictLoading] = useState(false);
   const [predictError, setPredictError] = useState(null);
@@ -58,7 +61,7 @@ function App() {
 
     Promise.all([
       axios.get('http://localhost:5000/api/health'),
-      axios.get('http://localhost:5000/api/hadoop/status'), 
+      axios.get('http://localhost:5000/api/hadoop/status'),
       axios.get('http://localhost:5000/api/accuracy')
     ])
       .then(([healthRes, hadoopRes, accRes]) => {
@@ -100,23 +103,36 @@ function App() {
   const handlePredictSubmit = e => {
     e.preventDefault();
     const { soil_ph, rainfall_mm, temperature_celsius } = predictForm;
+
     if (!soil_ph || !rainfall_mm || !temperature_celsius) {
       setPredictError('Lütfen tüm alanları doldurun');
       return;
     }
+
     setPredictLoading(true);
+    setPredictError(null);
+
+    console.log('Sending prediction request:', {
+      soil_ph: parseFloat(soil_ph),
+      rainfall_mm: parseFloat(rainfall_mm),
+      temperature_celsius: parseFloat(temperature_celsius)
+    });
+
     axios.post('http://localhost:5000/api/predict', {
       soil_ph: parseFloat(soil_ph),
       rainfall_mm: parseFloat(rainfall_mm),
       temperature_celsius: parseFloat(temperature_celsius)
     })
       .then(res => {
+        console.log('Prediction response:', res.data);
         setPredictResult(res.data);
         setPredictError(null);
       })
       .catch(err => {
         console.error('Predict error:', err);
-        setPredictError('Tahmin başarısız');
+        const errorMessage = err.response?.data?.error || 'Tahmin başarısız';
+        setPredictError(errorMessage);
+        setPredictResult(null);
       })
       .finally(() => setPredictLoading(false));
   };
@@ -127,18 +143,8 @@ function App() {
     setPredictError(null);
   };
 
-  const provinceStyle = feature => ({
-    fillColor: selectedProvince == feature.properties.id ? '#4CAF50' : '#3388ff',
-    weight: 2,
-    opacity: 1,
-    color: 'white',
-    dashArray: '3',
-    fillOpacity: 0.7
-  });
-
-  const onEachFeature = (feature, layer) => {
-    layer.on({ click: () => setSelectedProvince(feature.properties.id) });
-    layer.bindTooltip(feature.properties.name);
+  const getCropNameInTurkish = (cropName) => {
+    return cropMap[cropName] || cropName;
   };
 
   return (
@@ -146,6 +152,18 @@ function App() {
       <header className="App-header">
         <h1>Tarım Tahmin Uygulaması</h1>
         <p>Türkiye haritasından bir il seçerek verileri görüntüleyin</p>
+        {accuracy && (
+          <div className="accuracy-badge" style={{
+            background: '#4CAF50',
+            color: 'white',
+            padding: '5px 15px',
+            borderRadius: '20px',
+            fontSize: '14px',
+            marginTop: '10px'
+          }}>
+            Model Doğruluğu: %{accuracy}
+          </div>
+        )}
       </header>
 
       <nav className="main-nav">
@@ -164,7 +182,7 @@ function App() {
           path="/"
           element={
             <>
-              {/* 1) Haritayı tam genişlikte, nav’ın hemen altına koyduk */}
+              {/* Harita */}
               <div
                 className="map-container"
                 style={{
@@ -202,7 +220,7 @@ function App() {
                 </MapContainer>
               </div>
 
-              {/* 2) Form bölümlerini haritanın altına aldık */}
+              {/* Form bölümleri */}
               <div className="forms-wrapper">
                 <div className="province-selector">
                   <h2>İl Seçimi</h2>
@@ -230,9 +248,23 @@ function App() {
                     <div className="prediction-card">
                       <h3>Önerilen Ürün</h3>
                       {(() => {
-                        const idx = provinceData.recommended_crop;
-                        const label = cropClasses[idx];
-                        return <p className="prediction">{cropMap[label] || label}</p>;
+                        // Check if recommended_crop is a string (direct crop name) or a number (index)
+                        const crop = provinceData.recommended_crop;
+                        if (crop === null || crop === undefined) {
+                          return <p className="prediction">Veri bulunamadı</p>;
+                        }
+                        
+                        let cropName;
+                        if (typeof crop === 'number' || !isNaN(parseInt(crop))) {
+                          // If it's a number, use it as an index to cropClasses
+                          const idx = parseInt(crop);
+                          cropName = cropClasses[idx];
+                        } else {
+                          // If it's a string, use it directly
+                          cropName = crop;
+                        }
+                        
+                        return <p className="prediction">{getCropNameInTurkish(cropName)}</p>;
                       })()}
                     </div>
                   </div>
@@ -240,19 +272,47 @@ function App() {
 
                 <div className="predict-section">
                   <h2>Manuel Tahmin Yap</h2>
-                  <p>Aşağıdaki form alanlarını doldurarak, girdiğiniz verilere göre en uygun tarım ürününü tahmin edebilirsiniz. Lütfen ilgili değerleri milimetre (mm) ve Santigrat (°C) cinsinden girin.</p>
+                  <p>Aşağıdaki form alanlarını doldurarak, girdiğiniz verilere göre en uygun tarım ürününü tahmin edebilirsiniz.</p>
+
                   <form onSubmit={handlePredictSubmit} className="predict-form">
                     <div className="form-group">
-                      <label htmlFor="soil_ph">Toprak pH:</label>
-                      <input type="number" id="soil_ph" name="soil_ph" value={predictForm.soil_ph} onChange={handlePredictInputChange} step="0.1" />
+                      <label htmlFor="soil_ph">Toprak pH (0-14):</label>
+                      <input
+                        type="number"
+                        id="soil_ph"
+                        name="soil_ph"
+                        value={predictForm.soil_ph}
+                        onChange={handlePredictInputChange}
+                        step="0.1"
+                        min="0"
+                        max="14"
+                        placeholder="Örn: 6.5"
+                      />
                     </div>
                     <div className="form-group">
                       <label htmlFor="rainfall_mm">Yağış (mm):</label>
-                      <input type="number" id="rainfall_mm" name="rainfall_mm" value={predictForm.rainfall_mm} onChange={handlePredictInputChange} step="0.1" />
+                      <input
+                        type="number"
+                        id="rainfall_mm"
+                        name="rainfall_mm"
+                        value={predictForm.rainfall_mm}
+                        onChange={handlePredictInputChange}
+                        step="0.1"
+                        min="0"
+                        placeholder="Örn: 200"
+                      />
                     </div>
                     <div className="form-group">
                       <label htmlFor="temperature_celsius">Sıcaklık (°C):</label>
-                      <input type="number" id="temperature_celsius" name="temperature_celsius" value={predictForm.temperature_celsius} onChange={handlePredictInputChange} step="0.1" />
+                      <input
+                        type="number"
+                        id="temperature_celsius"
+                        name="temperature_celsius"
+                        value={predictForm.temperature_celsius}
+                        onChange={handlePredictInputChange}
+                        step="0.1"
+                        placeholder="Örn: 25"
+                      />
                     </div>
                     <div className="form-buttons">
                       <button type="submit" disabled={predictLoading}>
@@ -261,32 +321,56 @@ function App() {
                       <button type="button" onClick={resetPredictForm}>
                         Temizle
                       </button>
-                      <button type="button" onClick={resetPredictForm}>
-                        Temizle
-                      </button>
                     </div>
                   </form>
-                  {predictError && <p className="error">{predictError}</p>}
-                  {predictResult && (
-                      <div className="predict-result">
-                        <h3>Tahmin Sonucu</h3>
-                        <div className="result-card">
-                          <div className="result-item">
-                            <h4>Önerilen İl:</h4>
-                            <p className="result-value">{predictResult.predicted_province_name}</p>
-                          </div>
-                          <div className="result-item">
-                            <h4>İl ID:</h4>
-                            <p className="result-value">{predictResult.predicted_province_id}</p>
-                          </div>
-                          <div className="input-summary">
-                            <h4>Girilen Değerler:</h4>
-                            <p>pH: {predictResult.input_data.soil_ph}</p>
-                            <p>Yağış: {predictResult.input_data.rainfall_mm} mm</p>
-                            <p>Sıcaklık: {predictResult.input_data.temperature_celsius} °C</p>
-                          </div>
+
+                  {predictError && (
+                    <div className="error" style={{
+                      background: '#ffebee',
+                      color: '#c62828',
+                      padding: '10px',
+                      borderRadius: '4px',
+                      marginTop: '10px'
+                    }}>
+                      Hata: {predictError}
+                    </div>
+                  )}
+
+                  {predictResult && predictResult.success && (
+                    <div className="predict-result">
+                      <h3>🌱 Tahmin Sonucu</h3>
+                      <div className="result-card">
+                        <div className="result-item" style={{
+                          background: '#4CAF50',
+                          color: 'white',
+                          padding: '15px',
+                          borderRadius: '6px',
+                          marginBottom: '15px'
+                        }}>
+                          <h4>Önerilen Ürün:</h4>
+                          <p className="result-value" style={{
+                            fontSize: '24px',
+                            fontWeight: 'bold',
+                            margin: '5px 0'
+                          }}>
+                            {getCropNameInTurkish(predictResult.predicted_crop_name)}
+                          </p>
+                        </div>
+
+                        <div className="accuracy-info">
+                          <h4>Model Performansı:</h4>
+                          <p>Doğruluk Oranı: <strong>%{predictResult.model_accuracy}</strong></p>
+                          <p>Güven Seviyesi: <strong>{predictResult.confidence}</strong></p>
+                        </div>
+
+                        <div className="input-summary">
+                          <h4>Girilen Değerler:</h4>
+                          <p><strong>pH:</strong> {predictResult.input.soil_ph}</p>
+                          <p><strong>Yağış:</strong> {predictResult.input.rainfall_mm} mm</p>
+                          <p><strong>Sıcaklık:</strong> {predictResult.input.temperature_celsius} °C</p>
                         </div>
                       </div>
+                    </div>
                   )}
                 </div>
               </div>
