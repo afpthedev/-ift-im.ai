@@ -1,0 +1,35 @@
+{"timestamp": "2025-05-30T12:53:23", "level": "INFO", "message": "Loaded Naive Bayes model from disk."}
+{"timestamp": "2025-05-30T12:53:43", "level": "ERROR", "message": "Failed to sync logs to HDFS: Path does not exist: hdfs://namenode:9000/app/logs/requests.log"}
+{"timestamp": "2025-05-30T13:01:07", "level": "INFO", "message": "Loaded Naive Bayes model from disk."}
+{"timestamp": "2025-05-30T13:01:19", "level": "INFO", "message": "Loaded Naive Bayes model from disk."}
+{"timestamp": "2025-05-30T13:01:20", "level": "INFO", "message": "Loaded Naive Bayes model from disk."}
+{"timestamp": "2025-05-30T13:03:08", "level": "INFO", "message": "Loaded soil data from HDFS (81 rows)."}
+{"timestamp": "2025-05-30T13:03:09", "level": "INFO", "message": "Loaded soil data from HDFS (81 rows)."}
+{"timestamp": "2025-05-30T13:03:10", "level": "ERROR", "message": "Failed to sync logs to HDFS: 
+Syntax error at or near 'DIRECTORY'(line 1, pos 7)
+
+== SQL ==
+CREATE DIRECTORY IF NOT EXISTS hdfs://namenode:9000/user/root/request_logs
+-------^^^
+"}
+{"timestamp": "2025-05-30T13:03:20", "level": "ERROR", "message": "Failed to sync logs to HDFS: 
+Syntax error at or near 'DIRECTORY'(line 1, pos 7)
+
+== SQL ==
+CREATE DIRECTORY IF NOT EXISTS hdfs://namenode:9000/user/root/request_logs
+-------^^^
+"}
+{"timestamp": "2025-05-30T13:05:28", "level": "ERROR", "message": "Failed to sync logs to HDFS: 
+Syntax error at or near 'DIRECTORY'(line 1, pos 7)
+
+== SQL ==
+CREATE DIRECTORY IF NOT EXISTS hdfs://namenode:9000/user/root/request_logs
+-------^^^
+"}
+{"timestamp": "2025-05-30T13:20:04", "level": "ERROR", "message": "Failed to sync logs to HDFS: 
+Syntax error at or near 'DIRECTORY'(line 1, pos 7)
+
+== SQL ==
+CREATE DIRECTORY IF NOT EXISTS hdfs://namenode:9000/user/root/request_logs
+-------^^^
+"}
