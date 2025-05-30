@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
-import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
+import { Routes, Route, NavLink } from 'react-router-dom';
 import 'leaflet/dist/leaflet.css';
 import turkeyGeoJson from './turkey-provinces.json';
 import About from './About'; // Eğer About.js’iniz yoksa bu satırı kaldırın
@@ -287,7 +287,6 @@ function App() {
                           </div>
                         </div>
                       </div>
-                    </div>
                   )}
                 </div>
               </div>

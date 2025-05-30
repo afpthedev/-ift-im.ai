@@ -83,18 +83,16 @@ services:
     networks:
       - agri-network
 
-  # Flask Backend Servisi
   flask-backend:
     build:
-      context: ./backend
+      context: ./backend     # ← now Dockerfile sees backend/requirements.txt
+      # dockerfile: Dockerfile  # optional, it will pick backend/Dockerfile by default
     ports:
       - '5000:5000'
     volumes:
       - ./backend:/app
       - ./data:/app/data
       - ./hadoop/config:/app/hadoop/config
-    environment:
-      - JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
     depends_on:
       - spark-master
       - namenode

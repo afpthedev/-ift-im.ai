@@ -1,0 +1,76 @@
+{"timestamp": "2025-05-28T13:34:06.440034", "method": "GET", "path": "/api/provinces", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T13:34:13.866986", "method": "GET", "path": "/api/provinces", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T13:34:14.222565", "method": "GET", "path": "/api/hadoop/status", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T13:34:18.534045", "method": "OPTIONS", "path": "/api/predict", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T13:34:18.635607", "method": "POST", "path": "/api/predict", "args": {}, "json": {"soil_ph": 2, "rainfall_mm": 2, "temperature_celsius": 23}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T13:35:37.573941", "method": "OPTIONS", "path": "/api/provinces", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T13:35:44.705916", "method": "GET", "path": "/api/provinces", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T13:35:45.023536", "method": "GET", "path": "/api/hadoop/status", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T13:35:48.484493", "method": "OPTIONS", "path": "/api/predict", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T13:35:48.606124", "method": "POST", "path": "/api/predict", "args": {}, "json": {"soil_ph": 2, "rainfall_mm": 2, "temperature_celsius": 23}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T13:40:47.092426", "method": "OPTIONS", "path": "/api/provinces", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T13:40:47.845752", "method": "GET", "path": "/api/provinces", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T14:19:28.066175", "method": "OPTIONS", "path": "/api/provinces", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T14:19:36.481675", "method": "GET", "path": "/api/provinces", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T14:19:36.750210", "method": "GET", "path": "/api/hadoop/status", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T14:26:26.377040", "method": "OPTIONS", "path": "/api/provinces", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T14:26:26.936723", "method": "GET", "path": "/api/provinces", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T14:33:54.252178", "method": "OPTIONS", "path": "/api/accuracy", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T14:33:54.821453", "method": "GET", "path": "/api/provinces", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T14:33:57.544644", "method": "OPTIONS", "path": "/api/predict", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T14:33:57.629742", "method": "POST", "path": "/api/predict", "args": {}, "json": {"soil_ph": 2, "rainfall_mm": 2, "temperature_celsius": 2}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T14:35:32.738413", "method": "OPTIONS", "path": "/api/logs", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T14:35:32.842332", "method": "GET", "path": "/api/logs", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T14:35:56.699562", "method": "OPTIONS", "path": "/api/provinces", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T14:36:16.830183", "method": "OPTIONS", "path": "/api/logs", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T14:36:16.940400", "method": "GET", "path": "/api/logs", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T14:37:18.617149", "method": "OPTIONS", "path": "/api/logs", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T14:37:18.717967", "method": "GET", "path": "/api/logs", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T14:38:53.713119", "method": "OPTIONS", "path": "/api/province/6", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T14:38:53.814660", "method": "GET", "path": "/api/province/6", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T14:39:59.813485", "method": "OPTIONS", "path": "/api/provinces", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T14:40:00.219771", "method": "GET", "path": "/api/provinces", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T14:40:02.993408", "method": "OPTIONS", "path": "/api/logs", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-28T14:40:03.081552", "method": "GET", "path": "/api/logs", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T10:32:51.844787", "method": "OPTIONS", "path": "/api/health", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T10:33:01.640430", "method": "GET", "path": "/api/provinces", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T10:33:02.077076", "method": "GET", "path": "/api/hadoop/status", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T10:33:10.618375", "method": "OPTIONS", "path": "/api/province/33", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T10:33:10.703063", "method": "GET", "path": "/api/province/33", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T10:33:23.485554", "method": "OPTIONS", "path": "/api/predict", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T10:33:23.582151", "method": "POST", "path": "/api/predict", "args": {}, "json": {"soil_ph": 2, "rainfall_mm": 2, "temperature_celsius": 2}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T10:33:30.378386", "method": "OPTIONS", "path": "/api/logs", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T10:33:30.464742", "method": "GET", "path": "/api/logs", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T10:35:00.284201", "method": "OPTIONS", "path": "/api/province/75", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T10:35:13.942370", "method": "OPTIONS", "path": "/api/province/63", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T10:35:31.946118", "method": "OPTIONS", "path": "/api/predict", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T10:35:32.053728", "method": "POST", "path": "/api/predict", "args": {}, "json": {"soil_ph": 2, "rainfall_mm": 2, "temperature_celsius": 2}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T10:35:40.651932", "method": "OPTIONS", "path": "/api/predict", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T10:35:40.731230", "method": "POST", "path": "/api/predict", "args": {}, "json": {"soil_ph": 5, "rainfall_mm": 23, "temperature_celsius": 23}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T14:05:06.694948", "method": "GET", "path": "/api/accuracy", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T14:05:07.869572", "method": "GET", "path": "/api/accuracy", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T14:05:15.981748", "method": "GET", "path": "/api/provinces", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T14:05:16.362846", "method": "GET", "path": "/api/hadoop/status", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T14:06:09.956385", "method": "OPTIONS", "path": "/api/predict", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T14:06:10.057652", "method": "POST", "path": "/api/predict", "args": {}, "json": {"soil_ph": 2, "rainfall_mm": 2, "temperature_celsius": 2}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T14:09:21.015666", "method": "OPTIONS", "path": "/api/predict", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T14:09:21.116956", "method": "POST", "path": "/api/predict", "args": {}, "json": {"soil_ph": 2, "rainfall_mm": 2, "temperature_celsius": 2}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T14:09:22.478285", "method": "POST", "path": "/api/predict", "args": {}, "json": {"soil_ph": 2, "rainfall_mm": 2, "temperature_celsius": 2}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T14:10:20.753237", "method": "OPTIONS", "path": "/api/predict", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T14:10:21.259730", "method": "POST", "path": "/api/predict", "args": {}, "json": {"soil_ph": 2, "rainfall_mm": 2, "temperature_celsius": 2}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T14:10:23.809726", "method": "POST", "path": "/api/predict", "args": {}, "json": {"soil_ph": 2, "rainfall_mm": 2, "temperature_celsius": 2}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T14:10:25.903877", "method": "POST", "path": "/api/predict", "args": {}, "json": {"soil_ph": 2, "rainfall_mm": 2, "temperature_celsius": 23}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T14:10:26.929079", "method": "OPTIONS", "path": "/api/predict", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T14:10:27.012588", "method": "POST", "path": "/api/predict", "args": {}, "json": {"soil_ph": 2, "rainfall_mm": 2, "temperature_celsius": 23}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T14:10:27.682807", "method": "POST", "path": "/api/predict", "args": {}, "json": {"soil_ph": 2, "rainfall_mm": 2, "temperature_celsius": 23}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T14:10:30.820802", "method": "POST", "path": "/api/predict", "args": {}, "json": {"soil_ph": 2, "rainfall_mm": 2, "temperature_celsius": 23}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T14:11:38.351756", "method": "OPTIONS", "path": "/api/predict", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T14:11:38.461712", "method": "POST", "path": "/api/predict", "args": {}, "json": {"soil_ph": 2, "rainfall_mm": 2, "temperature_celsius": 23}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T14:11:42.681318", "method": "POST", "path": "/api/predict", "args": {}, "json": {"soil_ph": 2, "rainfall_mm": 2, "temperature_celsius": 23}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T14:11:43.502100", "method": "OPTIONS", "path": "/api/predict", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T14:11:43.989040", "method": "POST", "path": "/api/predict", "args": {}, "json": {"soil_ph": 2, "rainfall_mm": 2, "temperature_celsius": 23}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T14:12:09.034768", "method": "OPTIONS", "path": "/api/predict", "args": {}, "json": {}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T14:12:09.137511", "method": "POST", "path": "/api/predict", "args": {}, "json": {"soil_ph": 2, "rainfall_mm": 2, "temperature_celsius": 23}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T14:12:10.031097", "method": "POST", "path": "/api/predict", "args": {}, "json": {"soil_ph": 2, "rainfall_mm": 2, "temperature_celsius": 23}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T14:12:12.653108", "method": "POST", "path": "/api/predict", "args": {}, "json": {"soil_ph": 2, "rainfall_mm": 2, "temperature_celsius": 23}, "remote": "172.18.0.1"}
+{"timestamp": "2025-05-29T14:12:13.845160", "method": "POST", "path": "/api/predict", "args": {}, "json": {"soil_ph": 2, "rainfall_mm": 2, "temperature_celsius": 23}, "remote": "172.18.0.1"}
