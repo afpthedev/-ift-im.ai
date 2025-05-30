@@ -3,11 +3,13 @@ import os
 import pickle
 import requests
 import pandas as pd
+from datetime import datetime
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from pyspark.sql import SparkSession
 from sklearn.naive_bayes import GaussianNB
+from logger import HadoopLogger
 
 # --- Configuration ---
 BASE_DIR = os.getcwd()
@@ -27,6 +29,9 @@ WEATHER_API_URL  = 'http://api.weatherstack.com/current'
 app = Flask(__name__)
 CORS(app)
 
+# --- Logger setup ---
+logger = HadoopLogger()
+
 # --- Spark session ---
 spark = None
 def create_spark_session():
@@ -43,14 +48,14 @@ def load_soil_data():
     try:
         sdf = create_spark_session().read.csv(HDFS_DATA_PATH, header=True, inferSchema=True)
         df = sdf.toPandas()
-        app.logger.info(f"Loaded soil data from HDFS ({len(df)} rows).")
+        logger.info(f"Loaded soil data from HDFS ({len(df)} rows).")
     except Exception as e:
-        app.logger.warning(f"HDFS load failed ({e}); trying local CSV.")
+        logger.warning(f"HDFS load failed ({e}); trying local CSV.")
         if os.path.exists(LOCAL_DATA_PATH):
             df = pd.read_csv(LOCAL_DATA_PATH)
-            app.logger.info(f"Loaded soil data from local CSV ({len(df)} rows).")
+            logger.info(f"Loaded soil data from local CSV ({len(df)} rows).")
         else:
-            app.logger.error("Soil data not found locally either.")
+            logger.error("Soil data not found locally either.")
             df = pd.DataFrame()
     return df
 
@@ -74,7 +79,7 @@ def train_and_persist_model():
     os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
     with open(MODEL_PATH, 'wb') as f:
         pickle.dump(nb_model, f)
-    app.logger.info("Trained and saved Naive Bayes model.")
+    logger.info("Trained and saved Naive Bayes model.")
 
 def load_model():
     global nb_model
@@ -83,7 +88,7 @@ def load_model():
     if os.path.exists(MODEL_PATH):
         with open(MODEL_PATH, 'rb') as f:
             nb_model = pickle.load(f)
-        app.logger.info("Loaded Naive Bayes model from disk.")
+        logger.info("Loaded Naive Bayes model from disk.")
     else:
         train_and_persist_model()
 
@@ -119,7 +124,7 @@ def get_province_data(province_id):
         temperature = weather.get('temperature', 0.0)
         rainfall = weather.get('precip', 0.0)
     except Exception as e:
-        app.logger.error(f"Weather API failed: {e}")
+        logger.error(f"Weather API failed: {e}")
         temperature = None
         rainfall = None
 
@@ -183,7 +188,7 @@ def predict_crop():
             'input': data
         })
     except Exception as e:
-        app.logger.error(f"Prediction error: {e}")
+        logger.error(f"Prediction error: {e}")
         return jsonify({'error': 'Prediction failed', 'success': False}), 500
 
 @app.route('/api/health', methods=['GET'])
@@ -209,6 +214,21 @@ def hadoop_status():
         return jsonify({'status': 'connected', 'message': f'HDFS accessible: {count} rows'})
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/api/logs', methods=['GET'])
+def get_logs():
+    """Return the last 50 log entries from the application."""
+    logs = logger.get_recent_logs()
+    return jsonify(logs)
+
+@app.route('/api/logs/sync', methods=['POST'])
+def sync_logs():
+    """Manually trigger log sync to HDFS"""
+    try:
+        logger.sync_to_hdfs()
+        return jsonify({'success': True, 'message': 'Logs synced to HDFS successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

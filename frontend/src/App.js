@@ -43,6 +43,9 @@ function App() {
   const [errorProvince, setErrorProvince] = useState(null);
   const [systemStatus, setSystemStatus] = useState({});
   const [accuracy, setAccuracy] = useState(null);
+  const [logs, setLogs] = useState([]);
+  const [showLogsModal, setShowLogsModal] = useState(false);
+  const [syncStatus, setSyncStatus] = useState('');
 
   const [predictForm, setPredictForm] = useState({
     soil_ph: '',
@@ -62,17 +65,58 @@ function App() {
     Promise.all([
       axios.get('http://localhost:5000/api/health'),
       axios.get('http://localhost:5000/api/hadoop/status'),
-      axios.get('http://localhost:5000/api/accuracy')
+      axios.get('http://localhost:5000/api/accuracy'),
+      axios.get('http://localhost:5000/api/logs')
     ])
-      .then(([healthRes, hadoopRes, accRes]) => {
+      .then(([healthRes, hadoopRes, accRes, logsRes]) => {
         setSystemStatus({ api: healthRes.data, hadoop: hadoopRes.data });
         setAccuracy(accRes.data.accuracy);
+        setLogs(logsRes.data);
       })
       .catch(err => {
         console.error('Sistem durumu yüklenirken hata:', err);
         setSystemStatus({ error: 'Sistem durumu alınamadı' });
       });
   }, []);
+  
+  // Function to fetch logs
+  const fetchLogs = () => {
+    axios.get('http://localhost:5000/api/logs')
+      .then(res => setLogs(res.data))
+      .catch(err => console.error('Log kayıtları yüklenirken hata:', err));
+  };
+
+  // Sync logs to HDFS
+  const syncLogs = async () => {
+    try {
+      setSyncStatus('Loglar HDFS ile senkronize ediliyor...');
+      const response = await axios.post('http://localhost:5000/api/logs/sync');
+      if (response.data.success) {
+        setSyncStatus('Loglar HDFS ile senkronize edildi ✓');
+        setTimeout(() => setSyncStatus(''), 3000); // Clear message after 3 seconds
+      } else {
+        setSyncStatus('Senkronizasyon hatası: ' + response.data.error);
+        setTimeout(() => setSyncStatus(''), 5000);
+      }
+    } catch (error) {
+      setSyncStatus('Senkronizasyon hatası: ' + error.message);
+      setTimeout(() => setSyncStatus(''), 5000);
+    }
+  };
+
+  // Fetch logs periodically when modal is open
+  useEffect(() => {
+    // Only fetch logs if the modal is open
+    if (!showLogsModal) return;
+    
+    // Initial fetch and sync
+    fetchLogs();
+    syncLogs();
+    
+    // Set up periodic fetch
+    const intervalId = setInterval(fetchLogs, 5000);
+    return () => clearInterval(intervalId);
+  }, [showLogsModal]);
 
   // Fetch selected province data
   useEffect(() => {
@@ -166,6 +210,129 @@ function App() {
         )}
       </header>
 
+      {/* Sistem Durumu */}
+      <div className="system-status">
+        <h3 style={{ margin: '0 0 10px', fontSize: '0.9rem', color: '#f0f' }}>Sistem Durumu</h3>
+        <div style={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: '10px' }}>
+          <div className="status-item">
+            <strong>API:</strong>{' '}
+            {systemStatus.api && systemStatus.api.model_ready ? (
+              <span className="status-ok">Çalışıyor</span>
+            ) : (
+              <span className="status-error">Hata</span>
+            )}
+          </div>
+          <div className="status-item">
+            <strong>Hadoop:</strong>{' '}
+            {systemStatus.hadoop && systemStatus.hadoop.status === 'connected' ? (
+              <span className="status-ok">Bağlı ({systemStatus.hadoop.message})</span>
+            ) : (
+              <span className="status-error">Bağlantı Hatası{systemStatus.hadoop ? `: ${systemStatus.hadoop.message}` : ''}</span>
+            )}
+          </div>
+        </div>
+      </div>
+      
+
+
+      {/* Log Kayıtları Modal */}
+      {showLogsModal && (
+        <div className="modal-overlay" style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.85)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 1000
+        }}>
+          <div className="modal-content" style={{
+            backgroundColor: '#111',
+            color: '#fff',
+            border: '1px solid #0ff',
+            boxShadow: '0 0 20px #0ff',
+            width: '80%',
+            maxWidth: '900px',
+            maxHeight: '80vh',
+            overflowY: 'auto',
+            position: 'relative',
+            borderRadius: '8px',
+            padding: '20px'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+              <h2 style={{ margin: '0', fontSize: '1.2rem', color: '#f0f' }}>
+                <span role="img" aria-label="logs">📓</span> Sistem Log Kayıtları
+              </h2>
+              <button 
+                onClick={() => setShowLogsModal(false)}
+                style={{
+                  background: 'transparent',
+                  color: '#f00',
+                  border: '2px solid #f00',
+                  borderRadius: '50%',
+                  width: '30px',
+                  height: '30px',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  cursor: 'pointer',
+                  fontFamily: '"Press Start 2P", monospace',
+                  fontSize: '0.8rem',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.background = '#f00';
+                  e.target.style.color = '#fff';
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.background = 'transparent';
+                  e.target.style.color = '#f00';
+                }}
+              >
+                X
+              </button>
+            </div>
+            
+            <div style={{ marginBottom: '10px', fontSize: '0.7rem', color: '#0ff' }}>
+              <p>Otomatik yenileme aktif. Her 5 saniyede bir güncellenir.</p>
+            </div>
+            
+            <div className="logs-container" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
+              {logs.length > 0 ? (
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.7rem' }}>
+                  <thead style={{ position: 'sticky', top: 0, background: '#111' }}>
+                    <tr>
+                      <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #0ff', color: '#f0f' }}>Zaman</th>
+                      <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #0ff', color: '#f0f' }}>Seviye</th>
+                      <th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #0ff', color: '#f0f' }}>Mesaj</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {logs.map((log, index) => (
+                      <tr key={index} style={{ borderBottom: '1px solid #333' }}>
+                        <td style={{ padding: '8px', color: '#f0f' }}>{new Date(log.timestamp).toLocaleTimeString()}</td>
+                        <td style={{
+                          padding: '8px',
+                          color: log.level === 'ERROR' ? '#f00' : log.level === 'WARNING' ? '#ff0' : '#0f0'
+                        }}>
+                          {log.level}
+                        </td>
+                        <td style={{ padding: '8px', color: '#fff' }}>{log.message}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <p style={{ color: '#999', textAlign: 'center' }}>Log kayıtları yüklenemedi veya mevcut değil</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <nav className="main-nav">
         <ul>
           <li>
@@ -203,7 +370,7 @@ function App() {
                     data={turkeyGeoJson}
                     style={feature => ({
                       fillColor:
-                        selectedProvince == feature.properties.id
+                        selectedProvince === feature.properties.id
                           ? '#4CAF50'
                           : '#3388ff',
                       weight: 2,
@@ -379,6 +546,83 @@ function App() {
         />
         <Route path="/about" element={<About />} />
       </Routes>
+
+      {/* Logs Button */}
+      <button
+        className="logs-button"
+        onClick={() => setShowLogsModal(true)}
+        style={{
+          position: 'fixed',
+          bottom: '20px',
+          right: '20px',
+          padding: '10px 20px',
+          backgroundColor: '#4CAF50',
+          color: 'white',
+          border: 'none',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          zIndex: 1000
+        }}
+      >
+        Sistem Logları
+      </button>
+
+      {/* Logs Modal */}
+      {showLogsModal && (
+        <div className="modal-overlay" onClick={() => setShowLogsModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Sistem Log Kayıtları</h2>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button
+                  className="refresh-button"
+                  onClick={fetchLogs}
+                  style={{
+                    background: 'none',
+                    border: '1px solid #4CAF50',
+                    color: '#4CAF50',
+                    padding: '5px 10px',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px'
+                  }}
+                >
+                  <span>🔄</span> Yenile
+                </button>
+                <button
+                  className="close-button"
+                  onClick={() => setShowLogsModal(false)}
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+            <div className="modal-body">
+              <table className="logs-table">
+                <thead>
+                  <tr>
+                    <th>Zaman</th>
+                    <th>Seviye</th>
+                    <th>Mesaj</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {logs.map((log, index) => (
+                    <tr key={index} className={`log-level-${log.level.toLowerCase()}`}>
+                      <td>{new Date(log.timestamp).toLocaleString('tr-TR')}</td>
+                      <td>{log.level}</td>
+                      <td>{log.message}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
 
       <footer className="App-footer">
         <p>Hadoop, Spark, Flask &amp; React ile Tarım Tahmin © 2025</p>
